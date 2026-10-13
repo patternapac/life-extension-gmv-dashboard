@@ -27,6 +27,7 @@
     --g-vip:#6a86b8;
     --g-pdd:#539800;
     --g-b2b:#009dd5;
+    --g-other:#7a5aa6;
     --trend-up:#539800;
     --trend-down:#a41f35;
     --font-display:"Zilla Slab",Georgia,serif;
@@ -56,6 +57,7 @@
       --g-vip:#9db3dd;
       --g-pdd:#8ec94a;
       --g-b2b:#4fc1ea;
+      --g-other:#b49be0;
       --trend-up:#8ec94a;
       --trend-down:#e0657a;
     }
@@ -83,6 +85,7 @@
     --g-vip:#9db3dd;
     --g-pdd:#8ec94a;
     --g-b2b:#4fc1ea;
+    --g-other:#b49be0;
     --trend-up:#8ec94a;
     --trend-down:#e0657a;
   }
@@ -190,6 +193,10 @@
   .card h2{font-family:var(--font-display);color:var(--brand-navy);font-size:1.12rem;margin:0 0 2px;font-weight:700;}
   .card .card-sub{font-size:.82rem;color:var(--text-secondary);margin:0 0 12px;}
 
+  .grp-note{font-size:.74rem;color:var(--text-muted);font-weight:400;}
+  .grp-note.stacked{display:block;font-size:.68rem;line-height:1.2;}
+  #tooltip .tt-row .name{align-items:flex-start;}
+  #tooltip .tt-row .dot{margin-top:4px;}
   .legend{display:flex;flex-wrap:wrap;gap:12px;margin:2px 0 14px;}
   .legend .item{display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--text-secondary);}
   .legend .swatch{width:10px;height:10px;border-radius:2px;flex:none;}
@@ -197,7 +204,7 @@
   .mix-wrap{display:flex;align-items:center;gap:30px;flex-wrap:wrap;}
   .donut-scroll{flex:none;}
   svg.donut{display:block;}
-  .mix-wrap .legend{margin:0;flex-direction:column;gap:7px;flex:0 1 auto;max-width:300px;min-width:220px;}
+  .mix-wrap .legend{margin:0;flex-direction:column;gap:7px;flex:0 1 auto;max-width:480px;min-width:220px;}
   .mix-wrap .legend .item{
     display:grid;grid-template-columns:10px 1fr auto auto;align-items:center;
     gap:8px;font-size:.84rem;color:var(--text-secondary);width:100%;
@@ -211,6 +218,15 @@
     text-align:right;color:var(--text-muted);font-variant-numeric:tabular-nums;min-width:42px;
   }
 
+  .toolbar{
+    display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+    background:var(--surface);border:1px solid var(--border);border-radius:10px;
+    padding:10px 14px;margin-bottom:14px;
+  }
+  .toolbar .tb-note{margin-left:auto;font-size:.76rem;color:var(--text-muted);}
+  .table-note{font-size:.76rem;color:var(--text-muted);margin:10px 2px 0;}
+  .cur-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:5px;}
+  .rate-note{font-size:.72rem;color:var(--text-muted);}
   .chart-controls{
     display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;
     gap:10px;margin-bottom:10px;
@@ -282,9 +298,12 @@
         <p class="subtitle">GMV trend and breakdown by channel. Updated daily with GMV data through the previous day.</p>
         <span class="demo-badge" id="syncBadge">Syncing…</span>
       </div>
-      <div class="seg" id="currencySeg" role="group" aria-label="Currency">
-        <button data-c="CNY" aria-pressed="true">CNY ¥</button>
-        <button data-c="USD" aria-pressed="false">USD $</button>
+      <div class="cur-wrap">
+        <div class="seg" id="currencySeg" role="group" aria-label="Currency">
+          <button data-c="CNY" aria-pressed="true">CNY ¥</button>
+          <button data-c="USD" aria-pressed="false">USD $</button>
+        </div>
+        <div class="rate-note" id="rateNote"></div>
       </div>
     </div>
   </header>
@@ -345,42 +364,39 @@
 
   <section class="module m-teal data-dependent" id="chartCard">
     <div class="module-bar">
-      <div class="mod-title"><h2>GMV Trend</h2><span class="mod-sub">By day, week or month &middot; independent of the period above</span></div>
+      <div class="mod-title"><h2>GMV Trend &amp; Detail</h2><span class="mod-sub">Chart and daily table share the month selected below</span></div>
     </div>
     <div class="module-body">
+      <div class="toolbar">
+        <div class="month-nav">
+          <button id="navPrev" aria-label="Previous">‹</button>
+          <span id="navLabel">—</span>
+          <button id="navNext" aria-label="Next">›</button>
+        </div>
+        <div class="seg" id="chartGranSeg" role="group" aria-label="Chart granularity">
+          <button data-g="day" aria-pressed="true">Day</button>
+          <button data-g="week" aria-pressed="false">Week</button>
+          <button data-g="month" aria-pressed="false">Month</button>
+        </div>
+        <span class="tb-note">Applies to both sections below</span>
+      </div>
+
       <div class="panel">
         <h3>GMV by Platform</h3>
-        <p class="card-sub">Stacked bars by day, week, or month for the selected month. Hover a bar for the channel breakdown.</p>
-        <div class="chart-controls">
-          <div class="seg" id="chartGranSeg" role="group" aria-label="Chart granularity">
-            <button data-g="day" aria-pressed="true">Day</button>
-            <button data-g="week" aria-pressed="false">Week</button>
-            <button data-g="month" aria-pressed="false">Month</button>
-          </div>
-          <div class="month-nav">
-            <button id="navPrev" aria-label="Previous">‹</button>
-            <span id="navLabel">—</span>
-            <button id="navNext" aria-label="Next">›</button>
-          </div>
-        </div>
+        <p class="card-sub">Stacked bars by day, week, or month. Hover a bar for the channel breakdown.</p>
         <div class="legend" id="legend"></div>
         <div class="chart-scroll">
           <svg class="chart" id="chartSvg"></svg>
         </div>
       </div>
-    </div>
-  </section>
 
-  <section class="module data-dependent">
-    <div class="module-bar">
-      <div class="mod-title"><h2>Channel Detail</h2><span class="mod-sub">Daily GMV by channel &middot; follows the month selected in GMV Trend</span></div>
-    </div>
-    <div class="module-body">
       <div class="panel">
+        <h3>Channel Detail</h3>
         <p class="card-sub">Daily GMV by channel for the selected month, with a month-to-date total at the top.</p>
         <div class="table-scroll">
           <table class="detail" id="detailTable"></table>
         </div>
+        <p class="table-note">Other Channels incl. RED, VIP, PDD, Sub-dist. (B2B).</p>
       </div>
     </div>
   </section>
@@ -394,16 +410,13 @@
   "use strict";
 
   var MONTH_ABBR = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-  var USD_RATE = 7.2; // fixed CNY-per-USD rate (placeholder until a live rate is wired in)
+  var USD_RATE = 6.75; // fixed CNY-per-USD rate used for all USD figures
 
   var GROUPS = [
     {key:"tmall", label:"Tmall", color:"var(--g-tmall)"},
     {key:"jd", label:"JD", color:"var(--g-jd)"},
     {key:"douyin", label:"Douyin", color:"var(--g-douyin)"},
-    {key:"red", label:"RED", color:"var(--g-red)"},
-    {key:"vip", label:"VIP", color:"var(--g-vip)"},
-    {key:"pdd", label:"PDD", color:"var(--g-pdd)"},
-    {key:"b2b", label:"Sub-dist. (B2B)", color:"var(--g-b2b)"}
+    {key:"other", label:"Other Channels", note:"incl. RED, VIP, PDD, Sub-dist. (B2B)", color:"var(--g-other)"}
   ];
 
   var SUBCHANNELS = [
@@ -413,10 +426,10 @@
     {key:"jd_self", label:"JD DS", group:"jd"},
     {key:"jd_pop", label:"JD POP", group:"jd"},
     {key:"douyin", label:"Douyin", group:"douyin"},
-    {key:"red", label:"RED", group:"red"},
-    {key:"vip", label:"VIP", group:"vip"},
-    {key:"pdd", label:"PDD", group:"pdd"},
-    {key:"b2b", label:"Sub-dist. (B2B)", group:"b2b"}
+    {key:"red", label:"RED", group:"other"},
+    {key:"vip", label:"VIP", group:"other"},
+    {key:"pdd", label:"PDD", group:"other"},
+    {key:"b2b", label:"Sub-dist. (B2B)", group:"other"}
   ];
 
   // ---- real data, baked in at build time from the ops fill-in sheet ----
@@ -449,6 +462,17 @@
     var total = 0;
     SUBCHANNELS.forEach(function(sc){ if (sc.group === groupKey) total += rec[sc.key]; });
     return total;
+  }
+
+  // Group label, with the small "incl. ..." note for the Other Channels group.
+  function appendGroupLabel(parent, g, stacked){
+    parent.appendChild(document.createTextNode(g.label));
+    if (g.note){
+      var n = document.createElement("span");
+      n.className = "grp-note" + (stacked ? " stacked" : "");
+      n.textContent = stacked ? g.note : " (" + g.note + ")";
+      parent.appendChild(n);
+    }
   }
 
   function fmtDate(d){
@@ -686,7 +710,7 @@
       row.appendChild(sw2);
       var label = document.createElement("span");
       label.className = "mix-label";
-      label.textContent = item.g.label;
+      appendGroupLabel(label, item.g, false);
       row.appendChild(label);
       var val = document.createElement("span");
       val.className = "mix-value";
@@ -781,7 +805,7 @@
       sw.style.background = g.color;
       item.appendChild(sw);
       var txt = document.createElement("span");
-      txt.textContent = g.label;
+      appendGroupLabel(txt, g, false);
       item.appendChild(txt);
       el.appendChild(item);
     });
@@ -811,7 +835,7 @@
       dot.style.background = r.g.color;
       nameWrap.appendChild(dot);
       var nameTxt = document.createElement("span");
-      nameTxt.textContent = r.g.label;
+      appendGroupLabel(nameTxt, r.g, true);
       nameWrap.appendChild(nameTxt);
       row.appendChild(nameWrap);
       var val = document.createElement("span");
@@ -953,9 +977,14 @@
     var y = chartState.anchor.getFullYear(), m = chartState.anchor.getMonth();
     var dayRows = fullMonthRecords(y, m);
 
-    var monthTotals = {}; SUBCHANNELS.forEach(function(sc){ monthTotals[sc.key] = 0; });
-    dayRows.forEach(function(row){ SUBCHANNELS.forEach(function(sc){ monthTotals[sc.key] += row[sc.key]; }); });
-    var monthGrand = 0; SUBCHANNELS.forEach(function(sc){ monthGrand += monthTotals[sc.key]; });
+    // Table columns: individual channels, with RED / VIP / PDD / Sub-dist. folded into "Other Channels".
+    var TABLE_COLS = SUBCHANNELS.filter(function(sc){ return sc.group !== "other"; }).map(function(sc){
+      return {label: sc.label, get: function(r){ return r[sc.key]; }};
+    }).concat([{label: "Other Channels", get: function(r){ return groupValue(r, "other"); }}]);
+
+    var monthTotals = TABLE_COLS.map(function(){ return 0; });
+    var monthGrand = 0;
+    dayRows.forEach(function(row){ TABLE_COLS.forEach(function(c, i){ var v = c.get(row); monthTotals[i] += v; monthGrand += v; }); });
 
     var table = document.getElementById("detailTable");
     table.innerHTML = "";
@@ -965,20 +994,20 @@
     // wrap onto two lines rather than stretching their column).
     var colgroup = document.createElement("colgroup");
     var DATE_COL_PCT = 15, TOTAL_COL_PCT = 10;
-    var chColPct = (100 - DATE_COL_PCT - TOTAL_COL_PCT) / SUBCHANNELS.length;
+    var chColPct = (100 - DATE_COL_PCT - TOTAL_COL_PCT) / TABLE_COLS.length;
     function addCol(pct){
       var col = document.createElement("col");
       col.style.width = pct + "%";
       colgroup.appendChild(col);
     }
     addCol(DATE_COL_PCT);
-    SUBCHANNELS.forEach(function(){ addCol(chColPct); });
+    TABLE_COLS.forEach(function(){ addCol(chColPct); });
     addCol(TOTAL_COL_PCT);
     table.appendChild(colgroup);
 
     var thead = document.createElement("thead");
     var htr = document.createElement("tr");
-    var headers = ["Date"].concat(SUBCHANNELS.map(function(sc){ return sc.label; })).concat(["Total"]);
+    var headers = ["Date"].concat(TABLE_COLS.map(function(c){ return c.label; })).concat(["Total"]);
     headers.forEach(function(h){
       var th = document.createElement("th");
       th.textContent = h;
@@ -995,9 +1024,9 @@
     tdM0.textContent = "MTD Total";
     tdM0.style.textAlign = "left";
     trM.appendChild(tdM0);
-    SUBCHANNELS.forEach(function(sc){
+    TABLE_COLS.forEach(function(c, i){
       var td = document.createElement("td");
-      td.textContent = fmtMoney(monthTotals[sc.key]);
+      td.textContent = fmtMoney(monthTotals[i]);
       trM.appendChild(td);
     });
     var tdMT = document.createElement("td");
@@ -1012,10 +1041,11 @@
       td0.textContent = MONTH_ABBR[row.date.getMonth()] + " " + row.date.getDate();
       tr.appendChild(td0);
       var rowTotal = 0;
-      SUBCHANNELS.forEach(function(sc){
+      TABLE_COLS.forEach(function(c){
+        var v = c.get(row);
         var td = document.createElement("td");
-        td.textContent = fmtMoney(row[sc.key]);
-        rowTotal += row[sc.key];
+        td.textContent = fmtMoney(v);
+        rowTotal += v;
         tr.appendChild(td);
       });
       var tdT = document.createElement("td");
@@ -1103,6 +1133,7 @@
   });
 
   renderLegend();
+  document.getElementById("rateNote").textContent = "USD calculated at 1 USD = " + USD_RATE.toFixed(2) + " CNY";
   renderAll();
 })();
 </script>
