@@ -957,19 +957,11 @@
 
   function updateNavLabel(){
     var lbl = document.getElementById("navLabel");
-    if (chartState.granularity === "month"){
-      lbl.textContent = String(chartState.anchor.getFullYear());
-    } else {
-      lbl.textContent = MONTH_ABBR[chartState.anchor.getMonth()] + " " + chartState.anchor.getFullYear();
-    }
+    // Always show "Mon YYYY" (the month the table follows), in every granularity.
+    lbl.textContent = MONTH_ABBR[chartState.anchor.getMonth()] + " " + chartState.anchor.getFullYear();
     var t = latestDay();
-    var atLatest;
-    if (chartState.granularity === "month"){
-      atLatest = chartState.anchor.getFullYear() >= t.getFullYear();
-    } else {
-      atLatest = (chartState.anchor.getFullYear() > t.getFullYear()) ||
-        (chartState.anchor.getFullYear() === t.getFullYear() && chartState.anchor.getMonth() >= t.getMonth());
-    }
+    var atLatest = (chartState.anchor.getFullYear() > t.getFullYear()) ||
+      (chartState.anchor.getFullYear() === t.getFullYear() && chartState.anchor.getMonth() >= t.getMonth());
     document.getElementById("navNext").disabled = atLatest;
   }
 
@@ -1103,17 +1095,20 @@
     Array.prototype.forEach.call(this.querySelectorAll("button"), function(b){ b.setAttribute("aria-pressed", "false"); });
     btn.setAttribute("aria-pressed", "true");
     chartState.granularity = btn.getAttribute("data-g");
+    // Choosing Month always jumps to the latest month (yesterday's month).
+    if (chartState.granularity === "month"){
+      var L = latestDay();
+      chartState.anchor = new Date(L.getFullYear(), L.getMonth(), 1);
+    }
     renderChartSection();
   });
   document.getElementById("navPrev").addEventListener("click", function(){
-    if (chartState.granularity === "month") chartState.anchor.setFullYear(chartState.anchor.getFullYear()-1);
-    else chartState.anchor.setMonth(chartState.anchor.getMonth()-1);
+    chartState.anchor.setMonth(chartState.anchor.getMonth()-1);
     renderChartSection();
   });
   document.getElementById("navNext").addEventListener("click", function(){
     if (this.disabled) return;
-    if (chartState.granularity === "month") chartState.anchor.setFullYear(chartState.anchor.getFullYear()+1);
-    else chartState.anchor.setMonth(chartState.anchor.getMonth()+1);
+    chartState.anchor.setMonth(chartState.anchor.getMonth()+1);
     renderChartSection();
   });
 
